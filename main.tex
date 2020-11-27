@@ -1,10 +1,12 @@
 \documentclass{article}
 \usepackage{pgfplots}
 \usepackage{pgfplotstable}
+\usepgfplotslibrary{groupplots}
 \pgfplotsset{compat=1.9}
 
 \begin{document}
 
+\section*{Example 1}
 \pgfplotstableread[col sep=comma]{test_data.csv}\datatable
 \begin{tikzpicture}
 \begin{axis}[
@@ -17,7 +19,7 @@
     axis y line shift=10pt,
     axis x line shift=5pt,
     ytick style={color=white},
-    xlabel={Month},
+    xlabel={Value},
     ytick=data,
     yticklabels from table={\datatable}{coef_name},
     ylabel={Coefficient},
@@ -36,4 +38,90 @@
             ] {\datatable};
 \end{axis}
 \end{tikzpicture}
+
+\section*{Example 2}
+\begin{center}
+\begin{tikzpicture}
+\begin{groupplot}[group style={group size=3 by 1, horizontal sep=0.4cm}]
+\nextgroupplot[
+	title=(a) Set of results 1,
+	title style={font=\footnotesize},
+    width=10cm,
+    height=12cm,
+    scale=0.45,
+    scaled ticks=false,
+    % From above
+    axis y line*=none,
+    axis x line*=bottom,
+    separate axis lines,
+    every outer y axis line/.append style=
+        {-stealth,white},
+    y dir=reverse,
+    axis y line shift=10pt,
+    axis x line shift=5pt,
+    ytick style={color=white},
+    xlabel={Value},
+    ytick=data,
+    yticklabels from table={\datatable}{coef_name},
+    ylabel={Coefficient},
+    xtick align=outside,
+    % Added for consistency
+    xtick={-3,-2,-1,0,1,2},
+    label style={font=\footnotesize},
+    tick label style={font=\scriptsize}
+    ]
+	\draw [dashed] (axis cs: 0,\pgfkeysvalueof{/pgfplots/ymin}) -- 
+                   (axis cs: 0,\pgfkeysvalueof{/pgfplots/ymax});
+    \addplot+ [error bars/.cd,
+                x explicit,
+                x dir=both,
+            ] table [
+                only marks,
+                x=beta_1,
+                y expr=\coordindex,
+                x error expr=\thisrow{SE_1}
+            ] {\datatable};
+
+\nextgroupplot[
+	title=(b) Set of results 2,
+	title style={font=\footnotesize},
+    width=10cm,
+    height=12cm,
+    scale=0.45,
+    scaled ticks=false,
+    % From above
+    axis y line*=none,
+    axis x line*=bottom,
+    separate axis lines,
+    every outer y axis line/.append style=
+        {-stealth,white},
+    y dir=reverse,
+    axis x line shift=5pt,
+    axis y line=none,
+    xlabel={Value},
+    ytick=data,
+    yticklabels from table={\datatable}{coef_name},
+    xtick align=outside,
+    % Added for consistency
+    xtick={-3,-2,-1,0,1,2},
+    label style={font=\footnotesize},
+    tick label style={font=\scriptsize}
+    ]
+    \draw [dashed] (axis cs: 0,\pgfkeysvalueof{/pgfplots/ymin}) -- 
+                   (axis cs: 0,\pgfkeysvalueof{/pgfplots/ymax});
+    \addplot+ [color=green,
+                mark options={fill=green},
+                error bars/.cd,
+                x explicit,
+                x dir=both,
+            ] table [
+                only marks,
+                x=beta_2,
+                y expr=\coordindex,
+                x error expr=\thisrow{SE_2}
+            ] {\datatable};
+\end{groupplot}
+\end{tikzpicture}
+\end{center}
+
 \end{document}
