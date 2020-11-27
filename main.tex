@@ -2,13 +2,37 @@
 \usepackage[utf8]{inputenc}
 
 \title{Plots of coefficients from multiple regressions}
-\author{bojeryd91 }
+\author{bojeryd91}
 \date{November 2020}
+\setlength{\parindent}{0pt}
+
+\usepackage{tikz,pgfplots}
+\pgfplotsset{compat=1.17}
+%\usepackage{hyperref}
+%\usepackage[font=small]{caption}
 
 \begin{document}
 
-\maketitle
-
-\section{Introduction}
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}
+  \begin{axis}[
+      width=\linewidth, % Scale the plot to \linewidth
+      grid=major, % Display a grid
+      grid style={dashed,gray!30}, % Set the style
+      xlabel=X Axis $U$, % Set the labels
+      ylabel=Y Axis $I$,
+      x unit=\si{\volt}, % Set the respective units
+      y unit=\si{\ampere},
+      legend style={at={(0.5,-0.2)},anchor=north}, % Put the legend below the plot
+      x tick label style={rotate=90,anchor=east} % Display labels sideways
+    ]
+    \addplot 
+    % add a plot from table; you select the columns by using the actual name in
+    % the .csv file (on top)
+    table[x=coef_1,y=SE_1, col sep=semicolon] {test_data.csv};
+  \end{axis}
+\end{tikzpicture}
+\end{figure}
 
 \end{document}
