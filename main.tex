@@ -8,6 +8,7 @@
 
 \section*{Example 1}
 \pgfplotstableread[col sep=comma]{test_data.csv}\datatable
+\begin{center}
 \begin{tikzpicture}
 \begin{axis}[
     axis y line*=none,
@@ -38,6 +39,7 @@
             ] {\datatable};
 \end{axis}
 \end{tikzpicture}
+\end{center}
 
 \section*{Example 2}
 \begin{center}
