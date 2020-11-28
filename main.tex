@@ -6,40 +6,77 @@
 
 \begin{document}
 
+
 \section*{Example 1}
+
+
+
+\pgfplotsset{
+    error bars with mapped color/.style={
+        disabledatascaling,
+        visualization depends on=\thisrow{err} \as \error,
+        scatter/@pre marker code/.append style={
+            /pgfplots/error bars/.cd,
+            error mark options={draw=mapped color},
+            error mark=|,
+            draw error bar={(0,0)}{(\error,0)},
+            draw error bar={(0,0)}{(-\error,0)}
+        }
+    }
+}
+
 \pgfplotstableread[col sep=comma]{test_data.csv}\datatable
+
 \begin{center}
 \begin{tikzpicture}
 \begin{axis}[
-    axis y line*=none,
-    axis x line*=bottom,
-    separate axis lines,
-    every outer y axis line/.append style=
-        {-stealth,white},
-    y dir=reverse,
-    axis y line shift=10pt,
-    axis x line shift=5pt,
-    ytick style={color=white},
+    colormap={greens}{color=(blue!40) color=(blue!100)},
+    disabledatascaling,
+    scatter/use mapped color={
+        draw=mapped color, fill=mapped color},
+    error bars with mapped color/.style={
+        visualization depends on=\thisrow{SE_1} \as \error,
+        scatter/@pre marker code/.append style={
+            /pgfplots/error bars/.cd,
+            error mark options={draw=mapped color},
+            error mark=|,
+            draw error bar={(0,0)}{(axis cs: \error,0)},
+            draw error bar={(0,0)}{(axis cs: -\error,0)}
+        },
+        scatter/@post marker code/.append code={}
+    },
+    separate axis lines,% Treat axes separately
     xlabel={Value},
-    ytick=data,
-    yticklabels from table={\datatable}{coef_name},
+    xmin=-5,
+    xmax=2.5,
+    xtick align=outside,
+    axis x line*=bottom,% Only at bottom
     ylabel={Coefficient},
-    xtick align=outside 
-    ]
+    every outer y axis line/.append style=
+        {-stealth,white},% Hide y axis
+    y dir=reverse,% List coefs as stored in file
+    axis y line shift=10pt,% Adds some distance b/w text and graph
+    ytick style={color=white},% Hide ticks as well
+    ytick=data,
+    yticklabels from table={\datatable}{coef_name}]
     \draw [dashed] (axis cs: 0,\pgfkeysvalueof{/pgfplots/ymin}) -- 
                    (axis cs: 0,\pgfkeysvalueof{/pgfplots/ymax});
-    \addplot+ [error bars/.cd,
-                x explicit,
-                x dir=both,
-            ] table [
-                only marks,
-                x=beta_1,
-                y expr=\coordindex,
-                x error expr=\thisrow{SE_1}
-            ] {\datatable};
+    \addplot [scatter,
+    scatter src=(abs(\thisrow{beta_1})-\thisrow{SE_1}>0),
+    only marks,
+    error bars with mapped color=SE_1,
+    error bars/.cd,
+        x dir=both,
+        x explicit
+    ] table [
+    x=beta_1, y expr=\coordindex]
+    {\datatable};
 \end{axis}
 \end{tikzpicture}
 \end{center}
+
+
+
 
 \section*{Example 2}
 \begin{center}
