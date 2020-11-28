@@ -90,20 +90,35 @@
     scale=0.45,
     scaled ticks=false,
     % From above
-    axis y line*=none,
-    axis x line*=bottom,
-    separate axis lines,
-    every outer y axis line/.append style=
-        {-stealth,white},
-    y dir=reverse,
-    axis y line shift=10pt,
-    axis x line shift=5pt,
-    ytick style={color=white},
+    colormap={greens}{color=(red!40) color=(red!100)},
+    disabledatascaling,
+    scatter/use mapped color={
+        draw=mapped color, fill=mapped color},
+    error bars with mapped color/.style={
+        visualization depends on=\thisrow{SE_1} \as \error,
+        scatter/@pre marker code/.append style={
+            /pgfplots/error bars/.cd,
+            error mark options={draw=mapped color},
+            error mark=|,
+            draw error bar={(0,0)}{(axis cs: \error,0)},
+            draw error bar={(0,0)}{(axis cs: -\error,0)}
+        },
+        scatter/@post marker code/.append code={}
+    },
+    separate axis lines,% Treat axes separately
     xlabel={Value},
+    xmin=-5,
+    xmax=2.5,
+    xtick align=outside,
+    axis x line*=bottom,% Only at bottom
+    ylabel={Coefficient},
+    every outer y axis line/.append style=
+        {-stealth,white},% Hide y axis
+    y dir=reverse,% List coefs as stored in file
+    axis y line shift=10pt,% Adds some distance b/w text and graph
+    ytick style={color=white},% Hide ticks as well
     ytick=data,
     yticklabels from table={\datatable}{coef_name},
-    ylabel={Coefficient},
-    xtick align=outside,
     % Added for consistency
     xtick={-3,-2,-1,0,1,2},
     label style={font=\footnotesize},
@@ -111,15 +126,17 @@
     ]
 	\draw [dashed] (axis cs: 0,\pgfkeysvalueof{/pgfplots/ymin}) -- 
                    (axis cs: 0,\pgfkeysvalueof{/pgfplots/ymax});
-    \addplot+ [error bars/.cd,
-                x explicit,
-                x dir=both,
-            ] table [
-                only marks,
-                x=beta_1,
-                y expr=\coordindex,
-                x error expr=\thisrow{SE_1}
-            ] {\datatable};
+    \addplot [
+        scatter,
+        scatter src=(abs(\thisrow{beta_1})-\thisrow{SE_1}>0),
+        only marks,
+        error bars with mapped color=SE_1,
+        error bars/.cd,
+            x dir=both,
+            x explicit
+        ] table [
+        x=beta_1, y expr=\coordindex]
+        {\datatable};
 
 \nextgroupplot[
 	title=(b) Set of results 2,
@@ -129,36 +146,50 @@
     scale=0.45,
     scaled ticks=false,
     % From above
-    axis y line*=none,
-    axis x line*=bottom,
-    separate axis lines,
-    every outer y axis line/.append style=
-        {-stealth,white},
-    y dir=reverse,
-    axis x line shift=5pt,
-    axis y line=none,
+    colormap={greens}{color=(green!30) color=(green!100)},
+    disabledatascaling,
+    scatter/use mapped color={
+        draw=mapped color, fill=mapped color},
+    error bars with mapped color/.style={
+        visualization depends on=\thisrow{SE_2} \as \error,
+        scatter/@pre marker code/.append style={
+            /pgfplots/error bars/.cd,
+            error mark options={draw=mapped color},
+            error mark=|,
+            draw error bar={(0,0)}{(axis cs: \error,0)},
+            draw error bar={(0,0)}{(axis cs: -\error,0)}
+        },
+        scatter/@post marker code/.append code={}
+    },
+    separate axis lines,% Treat axes separately
     xlabel={Value},
+    xmin=-5,
+    xmax=2.5,
+    xtick align=outside,
+    axis x line*=bottom,% Only at bottom
+    axis y line=none,% Removes y axis line and legends
+    y dir=reverse,% List coefs as stored in file
+    ytick style={color=white},% Hide ticks as well
     ytick=data,
     yticklabels from table={\datatable}{coef_name},
-    xtick align=outside,
     % Added for consistency
     xtick={-3,-2,-1,0,1,2},
     label style={font=\footnotesize},
     tick label style={font=\scriptsize}
     ]
-    \draw [dashed] (axis cs: 0,\pgfkeysvalueof{/pgfplots/ymin}) -- 
+	\draw [dashed] (axis cs: 0,\pgfkeysvalueof{/pgfplots/ymin}) -- 
                    (axis cs: 0,\pgfkeysvalueof{/pgfplots/ymax});
-    \addplot+ [color=green,
-                mark options={fill=green},
-                error bars/.cd,
-                x explicit,
-                x dir=both,
-            ] table [
-                only marks,
-                x=beta_2,
-                y expr=\coordindex,
-                x error expr=\thisrow{SE_2}
-            ] {\datatable};
+    \addplot [
+        scatter,
+        scatter src=(abs(\thisrow{beta_2})-\thisrow{SE_2}>0),
+        only marks,
+        error bars with mapped color=SE_2,
+        error bars/.cd,
+            x dir=both,
+            x explicit
+        ] table [
+        x=beta_2, y expr=\coordindex]
+        {\datatable};
 \end{groupplot}
 \end{tikzpicture}
 \end{center}
